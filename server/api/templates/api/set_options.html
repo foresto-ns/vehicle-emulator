@@ -1,0 +1,19 @@
+{% extends 'api/base.html' %}
+
+{% block content %}
+
+<form method="post" action="">
+    {% csrf_token %}
+
+    {{ form }}<br>
+    <button class="btn btn-success" type="submit">Сохранить</button>
+    <a role="button"
+       type="reset"
+       class="btn btn-danger"
+       href="{{ vehicle.get_absolute_url }}">
+       Отменить
+    </a>
+</form>
+
+{% endblock %}
+

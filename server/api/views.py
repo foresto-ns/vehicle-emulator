@@ -1,11 +1,13 @@
 from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.views.generic import DeleteView
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from api.forms import VehicleForm, SetOptionsForm, SetOnlineStatusForm, SetRentStatusForm
 from api.models import Vehicle, Trip
 from api.serializers import VehicleSerializer, SetOnlineSerializer, SetRentStatusSerializer, OptionsSerializer, \
     ErrorSerializer
@@ -13,19 +15,169 @@ from api.utils import send_msg_to_mq
 
 
 def index(request):
+    """Главная страница"""
     vehicles = Vehicle.objects.all()
     context = {
+        'title': 'Главная страница',
         'vehicles': vehicles
     }
     return render(request, 'api/index.html', context)
 
 
 def show_vehicle_info(request, pk):
+    """Просмотр детальной информации о ТС"""
     vehicle = Vehicle.objects.get(id=pk)
     context = {
+        'title': vehicle.number,
         'vehicle': vehicle
     }
     return render(request, 'api/detail.html', context)
+
+
+def create_vehicle(request):
+    """Создание ТС"""
+    error = ''
+    form = VehicleForm()
+    if request.method == 'POST':
+        data = VehicleSerializer(data=request.POST)
+        if data.is_valid():
+            data.save()
+            msg = {
+                'command': 'create',
+                'data': {
+                    'uid': data.data.get('id'),
+                    'number': data.data.get('number'),
+                    'is_online': data.data.get('is_online'),
+                    'rent_status': data.data.get('rent_status'),
+                    'options': data.data.get('options')
+                }
+            }
+            send_msg_to_mq(msg)
+            return redirect('home')
+        else:
+            error = 'Ошибка'
+            form = None
+    context = {
+        'title': 'Создание ТС',
+        'form': form,
+        'error': error
+    }
+    return render(request, 'api/create_vehicle.html', context)
+
+
+def set_options(request, pk):
+    """Изменение свойств ТС"""
+    vehicle = Vehicle.objects.get(id=pk)
+    error = ''
+    form = SetOptionsForm()
+    if request.method == 'GET':
+        if not vehicle.is_online:
+            error = 'Ошибка'
+            form = None
+
+    elif request.method == 'POST':
+        data = VehicleSerializer(vehicle, data=request.POST, partial=True)
+        if vehicle.is_online and data.is_valid():
+            data.save()
+            msg = {
+                'command': 'set_options',
+                'data': {
+                    'uid': pk,
+                    'options': data.data.get('options')
+                }
+            }
+            send_msg_to_mq(msg)
+            return redirect('vehicle_info', pk)
+        else:
+            error = 'Ошибка'
+            form = None
+
+    context = {
+        'title': 'Изменение свойств ТС',
+        'vehicle': vehicle,
+        'form': form,
+        'error': error
+    }
+    return render(request, 'api/set_options.html', context)
+
+
+def set_rent_status(request, pk):
+    """Изменение статуса аренды"""
+    vehicle = Vehicle.objects.get(id=pk)
+    error = ''
+    form = SetRentStatusForm()
+    if request.method == 'POST':
+        data = VehicleSerializer(vehicle, data=request.POST, partial=True)
+        if data.is_valid():
+            data.save()
+            msg = {
+                'command': 'set_rent_status',
+                'data': {
+                    'uid': pk,
+                    'rent_status': data.data.get('rent_status')
+                }
+            }
+            send_msg_to_mq(msg)
+            return redirect('vehicle_info', pk)
+        else:
+            error = 'Ошибка'
+            form = None
+
+    context = {
+        'title': 'Изменение статуса онлайн ТС',
+        'vehicle': vehicle,
+        'form': form,
+        'error': error
+    }
+    return render(request, 'api/set_options.html', context)
+
+
+def set_online(request, pk):
+    """Изменение статуса онлайн"""
+    vehicle = Vehicle.objects.get(id=pk)
+    error = ''
+    form = SetOnlineStatusForm()
+    if request.method == 'POST':
+        data = VehicleSerializer(vehicle, data=request.POST, partial=True)
+        if data.is_valid():
+            data.save()
+            msg = {
+                'command': 'set_online_status',
+                'data': {
+                    'uid': pk,
+                    'online': data.data.get('is_online')
+                }
+            }
+            send_msg_to_mq(msg)
+            return redirect('vehicle_info', pk)
+        else:
+            error = 'Ошибка'
+            form = None
+
+    context = {
+        'title': 'Изменение статуса онлайн ТС',
+        'vehicle': vehicle,
+        'form': form,
+        'error': error
+    }
+    return render(request, 'api/set_options.html', context)
+
+
+class VehicleDeleteView(DeleteView):
+    """Удаление ТС"""
+    model = Vehicle
+    template_name = 'api/delete_vehicle.html'
+    success_url = '/'
+
+    def post(self, request, *args, **kwargs):
+        msg = {
+            'command': 'delete',
+            'data': {
+                'uid': str(kwargs.get('pk'))
+            }
+        }
+        send_msg_to_mq(msg)
+        return super(VehicleDeleteView, self).post(request, *args, **kwargs)
 
 
 class VehicleOptions(APIView):

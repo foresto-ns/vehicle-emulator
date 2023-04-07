@@ -14,11 +14,33 @@
 	{% endfor %}
 </ul>
 
-<a target="_blank"
-    class="btn btn-info pull-right"
-    href="#">
-    Check It Out
+
+<a role="button"
+   class="btn btn-success pull-right"
+   href="{% url 'set_online' vehicle.id %}">
+   Изменить онлайн статус ТС
 </a>
+{% if vehicle.is_online %}
+<a role="button"
+   class="btn btn-primary pull-right"
+   href="{% url 'set_rent' vehicle.id %}">
+   Изменить статус аренды ТС
+</a>
+<a role="button"
+   class="btn btn-secondary pull-right"
+   href="{% url 'set_options' vehicle.id %}">
+   Изменить свойства ТС
+</a>
+<a role="button"
+   class="btn btn-danger pull-right"
+   href="{% url 'delete_vehicle' vehicle.id %}">
+   Удалить ТС
+</a>
+<br>
+{% endif %}
+sadasdasd
+
+
 
 {% endblock %}
 

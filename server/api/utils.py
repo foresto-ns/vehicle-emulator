@@ -1,14 +1,18 @@
 """Описание вспомогательных методов модуля"""
 import json
+import logging
 
 import pika
 
 from server.settings import env
 
+logger = logging.getLogger(__name__)
+
 
 def send_msg_to_mq(message: dict):
     """Отправка команды в MQ"""
-    credentials = pika.PlainCredentials(**{'username': env("RM_USER"), 'password': env("RM_PASSWORD")})
+    logger.info(message)
+    credentials = pika.PlainCredentials(username=env("RM_USER"), password=env("RM_PASSWORD"))
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(host=env("RM_HOST"), credentials=credentials))
     channel = connection.channel()

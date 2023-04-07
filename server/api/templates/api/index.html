@@ -1,16 +1,25 @@
 {% extends 'api/base.html' %}
 
 {% block content %}
-<h1>{{title}}</h1>
 
-<ul>
-	{% for v in vehicles %}
-	<li>
-		<h2><a href="{{ v.get_absolute_url }}}">{{v.number}}</a></h2>
-		<p>{{v.id}}</p>
-	</li>
-	{% endfor %}
-</ul>
+<a href="{% url 'vehicle_create' %}"><button class="btn btn-info">Добавить ТС</button></a>
+
+{% if vehicles %}
+	<ul class="nav flex-column">
+		{% for v in vehicles %}
+		<li class="nav-item">
+			<div class="card" style="width: 30rem;">
+				<div class="card-body">
+					<h5 class="card-title"><a class="nav-link active" aria-current="page" href="{{ v.get_absolute_url }}">{{v.number}}</a></h5>
+					<p class="card-text">{{v.id}}</p>
+				</div>
+			</div>
+		</li>
+		{% endfor %}
+	</ul>
+{% else %}
+	<h5>Нет записей о ТС</h5>
+{% endif %}
 
 {% endblock %}
 

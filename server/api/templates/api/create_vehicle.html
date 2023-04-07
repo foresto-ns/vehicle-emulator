@@ -1,0 +1,15 @@
+{% extends 'api/base.html' %}
+
+{% block content %}
+
+<form method="post" action="">
+    {% csrf_token %}
+    {% if form %}
+        {{ form }}
+    {% endif %}
+    <span>{{error}}</span>
+    <br><button class="btn btn-success" type="submit">Создать ТС</button>
+</form>
+
+{% endblock %}
+
