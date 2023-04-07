@@ -1,0 +1,468 @@
+{
+	"info": {
+		"_postman_id": "26261ab1-cb86-44b3-8e2f-eaa8504a4096",
+		"name": "Whoosh",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7956348"
+	},
+	"item": [
+		{
+			"name": "vehicle",
+			"item": [
+				{
+					"name": "get vehicles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8000/api/vehicle",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"vehicle"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create vehicle",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "number",
+									"value": "asdasda7",
+									"type": "text"
+								},
+								{
+									"key": "rent_status",
+									"value": "Not_available",
+									"type": "text"
+								},
+								{
+									"key": "is_online",
+									"value": "true",
+									"type": "text"
+								},
+								{
+									"key": "options",
+									"value": "{}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8000/api/vehicle/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"vehicle",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete vehicle",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8000/api/vehicle/41c1fed6-2b2a-4b56-a326-0148fe80ad13/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"vehicle",
+								"41c1fed6-2b2a-4b56-a326-0148fe80ad13",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "options",
+			"item": [
+				{
+					"name": "get options",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8000/api/options/414885ff-315b-4dfb-98ef-a4bf27e0f0a8",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"options",
+								"414885ff-315b-4dfb-98ef-a4bf27e0f0a8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "set options",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"color\": \"white\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8000/api/options/0cbc950e-c389-46e9-9ae2-707ed6d1e4e8",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"options",
+								"0cbc950e-c389-46e9-9ae2-707ed6d1e4e8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete options",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8000/api/options/0cbc950e-c389-46e9-9ae2-707ed6d1e4e8",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"options",
+								"0cbc950e-c389-46e9-9ae2-707ed6d1e4e8"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "trip",
+			"item": [
+				{
+					"name": "start trip",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "point_from",
+									"value": "a",
+									"type": "text"
+								},
+								{
+									"key": "point_to",
+									"value": "b",
+									"type": "text"
+								},
+								{
+									"key": "speed",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "vehicle",
+									"value": "4c18518d-2224-4cad-b21d-1756271fe270",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8000/api/trip/",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"trip",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "finish trip",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "point_from",
+									"value": "a",
+									"type": "text"
+								},
+								{
+									"key": "point_to",
+									"value": "b",
+									"type": "text"
+								},
+								{
+									"key": "speed",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "vehicle",
+									"value": "6fe0e0a3-cf48-42bf-9f46-6a25bf59471d",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8000/api/trip/finish/4c18518d-2224-4cad-b21d-1756271fe270",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"trip",
+								"finish",
+								"4c18518d-2224-4cad-b21d-1756271fe270"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "pause trip",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "point_from",
+									"value": "a",
+									"type": "text"
+								},
+								{
+									"key": "point_to",
+									"value": "b",
+									"type": "text"
+								},
+								{
+									"key": "speed",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "vehicle",
+									"value": "6fe0e0a3-cf48-42bf-9f46-6a25bf59471d",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8000/api/trip/pause/634afd6f-4630-4c89-9fd5-c306c3bc754c",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"trip",
+								"pause",
+								"634afd6f-4630-4c89-9fd5-c306c3bc754c"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "continue trip",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "point_from",
+									"value": "a",
+									"type": "text"
+								},
+								{
+									"key": "point_to",
+									"value": "b",
+									"type": "text"
+								},
+								{
+									"key": "speed",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "vehicle",
+									"value": "6fe0e0a3-cf48-42bf-9f46-6a25bf59471d",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8000/api/trip/continue/634afd6f-4630-4c89-9fd5-c306c3bc754c",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"trip",
+								"continue",
+								"634afd6f-4630-4c89-9fd5-c306c3bc754c"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "send command",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "vehicle",
+							"value": "47277287-63c7-4fca-b611-78c17f3b675f",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "asdasd",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8000/api/command/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"command",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "set online status",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "online",
+							"value": "false",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8000/api/vehicle/online/47277287-63c7-4fca-b611-78c17f3b675f",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"vehicle",
+						"online",
+						"47277287-63c7-4fca-b611-78c17f3b675f"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "set rent status",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "rent_status",
+							"value": "On_lease",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8000/api/vehicle/rent/0cbc950e-c389-46e9-9ae2-707ed6d1e4e8",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"vehicle",
+						"rent",
+						"0cbc950e-c389-46e9-9ae2-707ed6d1e4e8"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
