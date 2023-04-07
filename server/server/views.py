@@ -3,6 +3,7 @@ from drf_yasg.inspectors import SwaggerAutoSchema
 
 
 class CustomAutoSchema(SwaggerAutoSchema):
+    """Схема описания работы сваггера"""
     def get_tags(self, operation_keys=None):
         tags = self.overrides.get('tags', None) or getattr(self.view, 'swagger_tags', [])
         if not tags:
@@ -12,6 +13,7 @@ class CustomAutoSchema(SwaggerAutoSchema):
 
 
 class CustomOpenAPISchemaGenerator(OpenAPISchemaGenerator):
+    """Схема описания работы сваггера"""
     def get_schema(self, request=None, public=False):
         """Generate a :class:`.Swagger` object with custom tags"""
         swagger = super().get_schema(request, public)

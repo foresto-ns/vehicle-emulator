@@ -1,3 +1,4 @@
+"""Описание моделей данных модуля api"""
 import random
 import uuid
 
@@ -8,7 +9,9 @@ from django.urls import reverse
 def get_random_distance():
     return random.randint(0, 100)
 
+
 class Vehicle(models.Model):
+    """Модель ТС"""
     rent_choice = [
         ('Available', 'Доступен для аренды'),
         ('Not_available', 'Не доступен для аренды'),
@@ -38,6 +41,7 @@ class Vehicle(models.Model):
 
 
 class Command(models.Model):
+    """Модель команд"""
     id = models.UUIDField(unique=True, default=uuid.uuid4, primary_key=True, editable=False, verbose_name='Уникальный ключ в системе')
     name = models.CharField(max_length=64, verbose_name='Название команды')
     execution_time = models.FloatField(null=True, verbose_name='Время выполнения программы в секундах', editable=True, blank=True)
@@ -53,6 +57,7 @@ class Command(models.Model):
 
 
 class Trip(models.Model):
+    """Модель поездок"""
     id = models.UUIDField(unique=True, default=uuid.uuid4, primary_key=True, editable=False,
                           verbose_name='Уникальный ключ в системе')
     point_from = models.CharField(max_length=64, verbose_name='Место отправления')

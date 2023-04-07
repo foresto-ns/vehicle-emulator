@@ -11,6 +11,7 @@ class VehicleViewSet(mixins.CreateModelMixin,
                      mixins.DestroyModelMixin,
                      mixins.ListModelMixin,
                      GenericViewSet):
+    """Управление ТС"""
     queryset = Vehicle.objects.all()
     serializer_class = serializers.VehicleSerializer
     filter_backends = {DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter}
@@ -53,6 +54,7 @@ class VehicleViewSet(mixins.CreateModelMixin,
 class CommandViewSet(mixins.CreateModelMixin,
                      mixins.ListModelMixin,
                      GenericViewSet):
+    """Управление командами"""
     queryset = Command.objects.all()
     serializer_class = serializers.CommandSerializer
     filter_backends = {DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter}
@@ -79,6 +81,7 @@ class CommandViewSet(mixins.CreateModelMixin,
 class TripViewSet(mixins.CreateModelMixin,
                   mixins.ListModelMixin,
                   GenericViewSet):
+    """Управление поездками"""
     queryset = Trip.objects.all()
     filter_backends = {DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter}
     filterset_fields = ['id', 'point_from', 'point_to', 'distance', 'speed', 'start_date', 'is_done', 'vehicle']

@@ -1,11 +1,14 @@
 from django.http import Http404
 from django.shortcuts import render
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.models import Vehicle, Trip
-from api.serializers import VehicleSerializer, SetOnlineSerializer, SetRentStatusSerializer
+from api.serializers import VehicleSerializer, SetOnlineSerializer, SetRentStatusSerializer, OptionsSerializer, \
+    ErrorSerializer
 from api.utils import send_msg_to_mq
 
 
@@ -26,6 +29,7 @@ def show_vehicle_info(request, pk):
 
 
 class VehicleOptions(APIView):
+    """Управление свойствами ТС"""
     swagger_tags = ['options']
 
     def get_object(self, pk):
@@ -34,23 +38,29 @@ class VehicleOptions(APIView):
         except Vehicle.DoesNotExist:
             raise Http404
 
+    options_response = openapi.Response('Все свойства у ТС', OptionsSerializer)
+    error_response = openapi.Response('Транспортное средство оффлайн', ErrorSerializer)
+    empty_response = openapi.Response('Свойства удалены', None)
+
+    @swagger_auto_schema(responses={200: options_response, 400: error_response})
     def get(self, request, pk, format=None):
         """Получение значений свойств ТС"""
         snippet = self.get_object(pk)
         if snippet.is_online is False:
             return Response(
-                'Транспортное средство оффлайн. Вы не можете получить свойства ТС',
+                {'error': 'Транспортное средство оффлайн. Вы не можете получить свойства ТС'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         serializer = VehicleSerializer(snippet)
         return Response(serializer.data.get('options'))
 
+    @swagger_auto_schema(responses={200: options_response, 400: error_response})
     def patch(self, request, pk, format=None):
         """Обновление и добавление значений свойств ТС"""
         snippet = self.get_object(pk)
         if snippet.is_online is False:
             return Response(
-                'Транспортное средство оффлайн. Вы не можете поменять свойства ТС',
+                {'error': 'Транспортное средство оффлайн. Вы не можете поменять свойства ТС'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         if request.data:
@@ -66,12 +76,13 @@ class VehicleOptions(APIView):
             send_msg_to_mq(msg)
         return Response(VehicleSerializer(snippet).data.get('options'))
 
+    @swagger_auto_schema(responses={204: empty_response, 400: error_response})
     def delete(self, request, pk, format=None):
         """Удаление всех свойств у ТС"""
         snippet = self.get_object(pk)
         if snippet.is_online is False:
             return Response(
-                'Транспортное средство оффлайн. Вы не можете удалить свойства ТС',
+                {'error': 'Транспортное средство оффлайн. Вы не можете удалить свойства ТС'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         snippet.options = {}
@@ -88,6 +99,7 @@ class VehicleOptions(APIView):
 
 
 class FinishTrip(APIView):
+    """Завершение поездки"""
     swagger_tags = ['trip']
 
     def get_object(self, pk):
@@ -96,17 +108,21 @@ class FinishTrip(APIView):
         except Vehicle.DoesNotExist:
             raise Http404
 
+    finish_response = openapi.Response('Поездка завершена', None)
+    error_response = openapi.Response('Транспортное средство оффлайн или нет незавершенной поездки', ErrorSerializer)
+
+    @swagger_auto_schema(responses={200: finish_response, 400: error_response})
     def get(self, request, pk, format=None):
         """Завершение поездки"""
         snippet = self.get_object(pk)
         if snippet.is_online is False:
             return Response(
-                'Транспортное средство оффлайн. Вы не можете завершить поездку',
+                {'error': 'Транспортное средство оффлайн. Вы не можете завершить поездку'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         trip = Trip.objects.get(vehicle=pk, is_done=False)
         if not trip:
-            return Response('Незавершенной поездки нет', status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Незавершенной поездки нет'}, status=status.HTTP_400_BAD_REQUEST)
         msg = {
             'command': 'finish_trip',
             'data': {
@@ -120,6 +136,7 @@ class FinishTrip(APIView):
 
 
 class ContinueTrip(APIView):
+    """Продолжение поездки"""
     swagger_tags = ['trip']
 
     def get_object(self, pk):
@@ -128,17 +145,21 @@ class ContinueTrip(APIView):
         except Vehicle.DoesNotExist:
             raise Http404
 
+    continue_response = openapi.Response('Поездка возобновлена', None)
+    error_response = openapi.Response('Транспортное средство оффлайн или нет незавершенной поездки', ErrorSerializer)
+
+    @swagger_auto_schema(responses={200: continue_response, 400: error_response})
     def get(self, request, pk, format=None):
         """Продолжение поездки"""
         snippet = self.get_object(pk)
         if snippet.is_online is False:
             return Response(
-                'Транспортное средство оффлайн. Вы не можете продолжить поездку',
+                {'error': 'Транспортное средство оффлайн. Вы не можете продолжить поездку'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         trip = Trip.objects.filter(vehicle=pk, is_done=False)
         if not trip.exists():
-            return Response('Незавершенной поездки нет', status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Незавершенной поездки нет'}, status=status.HTTP_400_BAD_REQUEST)
         msg = {
             'command': 'continue_trip',
             'data': {
@@ -150,6 +171,7 @@ class ContinueTrip(APIView):
 
 
 class PauseTrip(APIView):
+    """Приостановка поездки"""
     swagger_tags = ['trip']
 
     def get_object(self, pk):
@@ -158,17 +180,21 @@ class PauseTrip(APIView):
         except Vehicle.DoesNotExist:
             raise Http404
 
+    pause_response = openapi.Response('Поездка приостановлена', None)
+    error_response = openapi.Response('Транспортное средство оффлайн или нет незавершенной поездки', ErrorSerializer)
+
+    @swagger_auto_schema(responses={200: pause_response, 400: error_response})
     def get(self, request, pk, format=None):
         """Приостановка поездки"""
         snippet = self.get_object(pk)
         if snippet.is_online is False:
             return Response(
-                'Транспортное средство оффлайн. Вы не можете приостановить поездку',
+                {'error': 'Транспортное средство оффлайн. Вы не можете приостановить поездку'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         trip = Trip.objects.filter(vehicle=pk, is_done=False)
         if not trip.exists():
-            return Response('Незавершенной поездки нет', status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Незавершенной поездки нет'}, status=status.HTTP_400_BAD_REQUEST)
         msg = {
             'command': 'pause_trip',
             'data': {
@@ -180,6 +206,7 @@ class PauseTrip(APIView):
 
 
 class SetOnlineStatus(APIView):
+    """Изменение статуса online"""
     swagger_tags = ['vehicle']
 
     def get_object(self, pk):
@@ -188,6 +215,10 @@ class SetOnlineStatus(APIView):
         except Vehicle.DoesNotExist:
             raise Http404
 
+    pause_response = openapi.Response('Статус изменен', VehicleSerializer)
+    error_response = openapi.Response('Невалидные данные', ErrorSerializer)
+
+    @swagger_auto_schema(responses={200: pause_response, 400: error_response})
     def patch(self, request, pk, format=None):
         """Изменение статуса online"""
         snippet = self.get_object(pk)
@@ -208,6 +239,7 @@ class SetOnlineStatus(APIView):
 
 
 class SetRentStatus(APIView):
+    """Изменение статуса аренды"""
     swagger_tags = ['vehicle']
 
     def get_object(self, pk):
@@ -216,14 +248,18 @@ class SetRentStatus(APIView):
         except Vehicle.DoesNotExist:
             raise Http404
 
+    pause_response = openapi.Response('Статус изменен', VehicleSerializer)
+    error_response = openapi.Response('Невалидные данные или транспортное средство оффлайн', ErrorSerializer)
+
+    @swagger_auto_schema(responses={200: pause_response, 400: error_response})
     def patch(self, request, pk, format=None):
-        """Изменение статуса online"""
+        """Изменение статуса аренды"""
         snippet = self.get_object(pk)
         serializer = SetRentStatusSerializer(data=request.data)
         if serializer.is_valid():
             if snippet.is_online is False:
                 return Response(
-                    'Транспортное средство оффлайн. Вы не можете поменять статус аренды',
+                    {'error': 'Транспортное средство оффлайн. Вы не можете поменять статус аренды'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             st = serializer.data.get('rent_status')
