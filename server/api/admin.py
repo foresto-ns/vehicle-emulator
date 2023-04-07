@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from api.models import Vehicle, Command
+from api.models import Vehicle, Command, Trip
 
 
 @admin.register(Vehicle)
@@ -13,8 +13,16 @@ class VehicleAdmin(admin.ModelAdmin):
 
 
 @admin.register(Command)
-class CommandsAdmin(admin.ModelAdmin):
+class CommandAdmin(admin.ModelAdmin):
     list_display = ('name', 'execution_time', 'vehicle')
     list_filter = ('name', 'execution_time', 'vehicle')
     ordering = ('-create_date',)
     search_fields = ('name', 'vehicle')
+
+
+@admin.register(Trip)
+class TripAdmin(admin.ModelAdmin):
+    list_display = ('point_from', 'point_to', 'is_done', 'distance', 'speed', 'vehicle', 'start_date')
+    list_filter = ('is_done', 'vehicle')
+    ordering = ('-start_date',)
+    search_fields = ('point_from', 'point_to', 'distance', 'speed', 'vehicle')
