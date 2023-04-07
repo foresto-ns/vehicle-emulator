@@ -1,0 +1,24 @@
+{% extends 'api/base.html' %}
+
+{% block content %}
+
+
+<h2>{{vehicle.number}}</h2>
+<p>{{vehicle.id}}</p>
+<p>Онлайн статус {{vehicle.is_online}}</p>
+<p>Статус аренды {{vehicle.rent_status}}</p>
+<p>Свойства</p>
+<ul>
+	{% for option, value in vehicle.options.items %}
+<li>{{option}}: {{value}}</li>
+	{% endfor %}
+</ul>
+
+<a target="_blank"
+    class="btn btn-info pull-right"
+    href="#">
+    Check It Out
+</a>
+
+{% endblock %}
+

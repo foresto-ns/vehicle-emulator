@@ -1,0 +1,107 @@
+version: '3'
+
+services:
+  emulator:
+    container_name: ${APP}-emulator
+    restart: always
+    build:
+      context: .
+      dockerfile: ./docker/emulator/Dockerfile
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq:rabbitmq
+    env_file:
+      - .env
+    volumes:
+      - ./emulator:/usr/src/app
+    networks:
+      - net
+
+  receiver:
+    container_name: ${APP}-receiver
+    restart: always
+    build:
+      context: .
+      dockerfile: ./docker/receiver/Dockerfile
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq:rabbitmq
+    env_file:
+      - .env
+    volumes:
+      - ./receiver:/usr/src/app
+    networks:
+      - net
+
+  rabbitmq:
+    image: rabbitmq:3.11.11-management
+    container_name: ${APP}-rabbitmq
+    hostname: ${APP}-rabbitmq
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RM_USER}
+      - RABBITMQ_DEFAULT_PASS=${RM_PASSWORD}
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit disk_free_limit 4096000
+    volumes:
+      - ./rabbitmq/rabbitmq_state:/var/lib/rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      - net
+
+  server:
+    container_name: ${APP}-server
+    restart: always
+    build:
+      context: .
+      dockerfile: ./docker/server/Dockerfile
+    expose:
+      - "8000"
+    ports:
+      - "8000:8000"
+    links:
+      - db:db
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      emulator:
+        condition: service_started
+    volumes:
+      - ./server:/usr/src/app
+      - ./static:/usr/src/static
+    command: /usr/local/bin/gunicorn server.wsgi:application -w 20 -b :8000
+    networks:
+      - net
+
+  db:
+    container_name: ${APP}-db
+    restart: always
+    image: postgres:14-alpine
+    expose:
+      - "5432"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+    networks:
+      - net
+
+volumes:
+  postgresql-data:
+
+networks:
+  net:

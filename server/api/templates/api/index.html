@@ -1,0 +1,16 @@
+{% extends 'api/base.html' %}
+
+{% block content %}
+<h1>{{title}}</h1>
+
+<ul>
+	{% for v in vehicles %}
+	<li>
+		<h2><a href="{{ v.get_absolute_url }}}">{{v.number}}</a></h2>
+		<p>{{v.id}}</p>
+	</li>
+	{% endfor %}
+</ul>
+
+{% endblock %}
+
