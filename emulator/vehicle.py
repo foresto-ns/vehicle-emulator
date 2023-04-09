@@ -161,13 +161,20 @@ class Vehicle:
         self._distance = distance
         self._speed = speed
 
-    async def get_geos(self) -> tuple[int, float]:
+    async def get_geos(self) -> dict[str, str | dict[str, int | float]]:
         """
         Получение геоданных
 
         :return: оставшееся расстояние и текущая скорость
         """
-        return self._distance, self._speed
+        geo = {
+            'uid': self._uid,
+            'data': {
+                'distance': self._distance,
+                'speed': self._speed,
+            }
+        }
+        return geo
 
     async def start_trip(self, distance, speed) -> None:
         """
@@ -251,5 +258,11 @@ class Vehicle:
         """
         exec_time = random.randint(1, 15)
         await asyncio.sleep(exec_time)
-        msg = {'command': name, 'time': exec_time}
-        await self._sender.send(msg)
+        info = {
+            'uid': self._uid,
+            'data': {
+                'command': name,
+                'time': exec_time
+            }
+        }
+        await self._sender.send(info)
